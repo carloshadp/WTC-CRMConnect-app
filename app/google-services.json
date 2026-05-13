@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1009181604827",
+    "project_id": "crmconnect-wtc",
+    "storage_bucket": "crmconnect-wtc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1009181604827:android:1b29d501186154317c85fe",
+        "android_client_info": {
+          "package_name": "com.wtc.crmconnect.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlPnT5oBR937GjiuLjNTQrMfoNgRiZ5G4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
