@@ -23,8 +23,14 @@ class AuthRepository @Inject constructor(
         apiCall(moshi) { authApi.login(LoginRequestDto(email, password)) }
             .onSuccess { persistSession(it, email) }
 
-    suspend fun register(email: String, password: String, role: Role): Result<AuthResponseDto> =
-        apiCall(moshi) { authApi.register(RegisterRequestDto(email, password, role)) }
+    suspend fun register(
+        email: String,
+        password: String,
+        role: Role,
+        name: String? = null,
+        phone: String? = null
+    ): Result<AuthResponseDto> =
+        apiCall(moshi) { authApi.register(RegisterRequestDto(email, password, role, name, phone)) }
             .onSuccess { persistSession(it, email) }
 
     suspend fun forgotPassword(email: String): Result<Unit> = apiCall(moshi) {

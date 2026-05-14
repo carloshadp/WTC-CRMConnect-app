@@ -3,13 +3,9 @@ package com.wtc.crmconnect.app.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
-import com.wtc.crmconnect.app.data.remote.dto.customer.CustomerRequestDto
-import com.wtc.crmconnect.app.data.remote.dto.enums.CustomerStatus
 import com.wtc.crmconnect.app.data.remote.dto.enums.Role
 import com.wtc.crmconnect.app.data.repository.AuthRepository
-import com.wtc.crmconnect.app.data.repository.CustomerRepository
 import com.wtc.crmconnect.app.data.repository.DeviceRepository
-import com.wtc.crmconnect.app.data.repository.SegmentRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +20,7 @@ data class AuthUiState(
     val email: String = "",
     val password: String = "",
     val confirmPassword: String = "",
+    val name: String = "",
     val phone: String = "",
     val userTypeLabel: String = "",
     val isLoading: Boolean = false
@@ -40,9 +37,7 @@ sealed interface AuthEvent {
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val deviceRepository: DeviceRepository,
-    private val customerRepository: CustomerRepository,
-    private val segmentRepository: SegmentRepository
+    private val deviceRepository: DeviceRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -54,6 +49,7 @@ class AuthViewModel @Inject constructor(
     fun onEmailChanged(value: String) = _uiState.update { it.copy(email = value) }
     fun onPasswordChanged(value: String) = _uiState.update { it.copy(password = value) }
     fun onConfirmPasswordChanged(value: String) = _uiState.update { it.copy(confirmPassword = value) }
+    fun onNameChanged(value: String) = _uiState.update { it.copy(name = value) }
     fun onPhoneChanged(value: String) = _uiState.update { it.copy(phone = value) }
     fun onUserTypeChanged(label: String) = _uiState.update { it.copy(userTypeLabel = label) }
 
@@ -96,15 +92,17 @@ class AuthViewModel @Inject constructor(
             sendError("Selecione o tipo de usuário.")
             return
         }
+        if (role == Role.CUSTOMER && state.name.isBlank()) {
+            sendError("Informe seu nome completo.")
+            return
+        }
         val email = state.email.trim()
+        val name = state.name.trim().ifBlank { null }
         val phone = state.phone.trim().ifBlank { null }
         _uiState.update { it.copy(isLoading = true) }
         viewModelScope.launch {
-            authRepository.register(email, state.password, role)
+            authRepository.register(email, state.password, role, name, phone)
                 .onSuccess {
-                    if (role == Role.CUSTOMER) {
-                        autoCreateCustomer(email, phone)
-                    }
                     _uiState.update { AuthUiState() }
                     _events.send(AuthEvent.RegisterSucceeded)
                 }
@@ -113,21 +111,6 @@ class AuthViewModel @Inject constructor(
                     sendError(ex.message ?: "Falha ao cadastrar.")
                 }
         }
-    }
-
-    private suspend fun autoCreateCustomer(email: String, phone: String?) {
-        val segmentId = segmentRepository.list(page = 0, size = 1)
-            .getOrNull()?.content?.firstOrNull()?.id ?: return
-        val request = CustomerRequestDto(
-            name = email.substringBefore("@"),
-            email = email,
-            phone = phone,
-            segmentId = segmentId,
-            tags = null,
-            score = null,
-            status = CustomerStatus.ATIVO
-        )
-        customerRepository.create(request)
     }
 
     fun forgotPassword() {

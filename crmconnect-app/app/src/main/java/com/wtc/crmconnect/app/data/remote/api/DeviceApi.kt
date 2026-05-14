@@ -5,7 +5,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface DeviceApi {
+interface aDeviceApi {
 
     @POST("device/token")
     suspend fun registerToken(@Body request: RegisterTokenRequestDto): Response<Unit>

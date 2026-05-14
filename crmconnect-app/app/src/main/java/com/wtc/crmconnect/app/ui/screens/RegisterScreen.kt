@@ -82,11 +82,13 @@ fun RegisterScreen(
         }
     }
 
+    val isCustomer = uiState.userTypeLabel == "Cliente"
     val isFormValid =
         uiState.userTypeLabel.isNotBlank() &&
                 uiState.email.isNotBlank() &&
                 uiState.password.isNotBlank() &&
-                uiState.confirmPassword.isNotBlank()
+                uiState.confirmPassword.isNotBlank() &&
+                (!isCustomer || uiState.name.isNotBlank())
 
     Scaffold(
         containerColor = Color(0xFF22394E),
@@ -169,6 +171,22 @@ fun RegisterScreen(
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 14.sp,
                             modifier = Modifier.padding(top = 4.dp)
+                        )
+
+                        OutlinedTextField(
+                            value = uiState.name,
+                            onValueChange = { viewModel.onNameChanged(it) },
+                            label = {
+                                Text(
+                                    if (isCustomer) "Nome completo *" else "Nome (opcional)",
+                                    fontFamily = Poppins
+                                )
+                            },
+                            singleLine = true,
+                            enabled = !uiState.isLoading,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = authFieldColors()
                         )
 
                         OutlinedTextField(
