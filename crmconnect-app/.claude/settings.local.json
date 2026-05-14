@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Test-Path *)",
+      "PowerShell($env:JAVA_HOME=\"C:\\\\Program Files\\\\Microsoft\\\\jdk-17.0.18.8-hotspot\"; Set-Location \"D:\\\\PROJETOS\\\\FREELAS\\\\000_challenge_WTC\\\\WTC_CRMConnect\\\\crmconnect-app\"; .\\\\gradlew.bat assembleRelease --no-daemon 2>&1 | Select-Object -Last 40)",
+      "PowerShell(Get-Item \"D:\\\\PROJETOS\\\\FREELAS\\\\000_challenge_WTC\\\\WTC_CRMConnect\\\\crmconnect-app\\\\app\\\\build\\\\outputs\\\\apk\\\\release\\\\app-release.apk\" | Select-Object Name, @{N='Size MB';E={[math]::Round\\($_.Length/1MB,1\\)}}, LastWriteTime)"
+    ]
+  }
+}
